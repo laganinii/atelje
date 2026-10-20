@@ -1,0 +1,35 @@
+{
+  "name": "atelje",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Atelje: a creative desk for notes, photo polaroids, links and sticky-note threads. iOS app built with Vite + Capacitor.",
+  "scripts": {
+    "dev": "vite",
+    "extract": "node scripts/extract-artifact.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "cap:sync": "npm run build && npx cap sync ios",
+    "test": "node --test tests/"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/keyboard": "^8.0.6",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/share": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "idb-keyval": "^6.3.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
+    "vite": "^8.3.4"
+  }
+}

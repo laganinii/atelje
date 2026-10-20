@@ -10,7 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "cap:sync": "npm run build && npx cap sync ios",
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.mjs",
     "check:ios": "node scripts/check-ios.mjs",
     "assets": "node scripts/make-assets.mjs && npx @capacitor/assets generate --ios --iconBackgroundColor \"#F5F1E8\" --splashBackgroundColor \"#F5F1E8\" --splashBackgroundColorDark \"#11100F\""
   },

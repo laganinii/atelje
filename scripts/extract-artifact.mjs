@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { en } from "./i18n-en.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const html = readFileSync(join(root, "source/atelje-artifact.html"), "utf8");
@@ -90,10 +91,12 @@ const jsPatches = [
   ["remove Glas from tap sheet",
     '{k:"audio",label:"Glas",sub:"12s memo — sirovi zvuk • local draft",icon:"\\uD83C\\uDFA4",color:"#D9B75F",action:()=>{Cl("audio",{x:he.canvasX,y:he.canvasY})}},', ""],
   ["remove Glas from + menu", '{k:"audio",label:"Glas",sub:"12s memo",icon:dl,color:"#D9B75F"},', ""],
-  ["audio card renderer unreachable", 'i.type==="audio"?v("div",{className:"mt-3 flex items-center gap-3', '!1?v("div",{className:"mt-3 flex items-center gap-3'],
-  ["audio card label", '"04:12 • local draft"', '"04:12"'],
-  ["audio detail label", '"04:12 • local"', '"04:12"'],
-  ["audio detail renderer unreachable", 'W.type==="audio"&&v("div",{className:"bg-black text-white rounded-[14px]', '!1&&v("div",{className:"bg-black text-white rounded-[14px]'],
+  ["remove audio card renderer (fake player)",
+    'i.type==="audio"?v("div",{className:"mt-3 flex items-center gap-3 bg-black/[0.03] rounded-[10px] px-3 py-3 border border-black/5",children:[a("div",{className:"w-8 h-8 rounded-full bg-black text-white flex items-center justify-center shrink-0",children:a(yt,{size:14})}),a("div",{className:"flex gap-[3px] items-end h-[20px]",children:[0.3,0.7,0.5,0.9,0.4,0.8,0.6,0.35].map((M,B)=>a("div",{className:"w-[4px] bg-black/80 rounded-full",style:{height:`${M*100}%`}},B))}),a("span",{className:"mono text-[10px] ml-auto text-[#6B6660]",children:"04:12 • local draft"})]}):',
+    ""],
+  ["remove audio detail player (fake player)",
+    'W.type==="audio"&&v("div",{className:"bg-black text-white rounded-[14px] p-4 flex items-center gap-4 mb-4",children:[a("div",{className:"w-11 h-11 rounded-full bg-white text-black flex items-center justify-center",children:a(yt,{size:18})}),a("div",{className:"flex gap-[4px] items-end h-[30px] flex-1",children:[0.4,0.9,0.5,0.8,0.6,0.95,0.45,0.75,0.55,0.85].map((i,p)=>a("div",{className:"flex-1 bg-white/80 rounded-full",style:{height:`${i*100}%`}},p))}),a("span",{className:"mono text-[11px] text-white/70",children:"04:12 • local"})]}),',
+    ""],
 
   // --- Developer notes visible in the UI -> user-facing copy --------------
   ["login label", '"atelje • session preview"', '"atelje"'],
@@ -134,6 +137,8 @@ const jsPatches = [
   ["settings profile label", '"Session • in-memory preview • no backend"', '"Profil"'],
   ["settings no session", '"Nema sesije — login je in-memory draft"', '"Nema profila"'],
   ["settings profile line", 'children:["Ime: ",e.name," • Uloge: ",e.roles.map((i)=>i.name).join(", ")," • Provider: ",e.provider]', 'children:["Ime: ",e.name," • Uloge: ",e.roles.map((i)=>i.name).join(", ")]'],
+  ["desk zoom HUD", '"% • ",zn.length," tragova • will-change transform only"]', '"% • ",zn.length," tragova"]'],
+  ["save note button", '"Spremi trag • scale 0.86→1"', '"Spremi trag"'],
   ["settings footer", '"No localStorage, no Supabase, no backend — visibly local • preview mode • production perfect"', '"Bez računa, bez servera. Tvoji tragovi ostaju na ovom uređaju."'],
 
   // --- Safe areas: header was offset twice; tab bar used the top inset ----
@@ -152,8 +157,15 @@ for (const [label, from, to, count] of jsPatches) js = patch(js, label, from, to
   js = js.slice(0, start) + js.slice(end + endMarker.length);
 }
 
+// 4. English UI (default language). See scripts/i18n-en.mjs.
+for (const [from, to] of en) {
+  const n = js.split(from).length - 1;
+  if (n < 1) throw new Error(`i18n: "${from}" not found`);
+  js = js.split(from).join(to);
+}
+
 // Final guard: none of the developer notes may survive.
-const forbidden = ["in-memory", "visibly local", "local draft", "preview mode", "production perfect", "no backend", "No localStorage", "Performance audit", "Nastavi s Apple ID", "Apple ID", "spring 0.32", "Glas\"", "Provider: "];
+const forbidden = ["in-memory", "visibly local", "local draft", "preview mode", "production perfect", "no backend", "No localStorage", "Performance audit", "Nastavi s Apple ID", "Apple ID", "spring 0.32", "Glas\"", "Provider: ", "will-change", "scale 0.86", "→1", "04:12\""];
 for (const f of forbidden) if (js.includes(f)) throw new Error(`forbidden string still present: ${f}`);
 
 mkdirSync(join(root, "src/app"), { recursive: true });

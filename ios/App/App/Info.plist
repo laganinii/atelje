@@ -5,7 +5,7 @@
 	<key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>hr</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>Atelje</string>
 	<key>CFBundleExecutable</key>
@@ -16,7 +16,6 @@
 	<string>6.0</string>
 	<key>CFBundleLocalizations</key>
 	<array>
-		<string>hr</string>
 		<string>en</string>
 	</array>
 	<key>CFBundleName</key>
@@ -34,7 +33,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Atelje koristi kameru samo kad odabereš „Snimi fotografiju” da dodaš polaroid na svoj stol. Fotografije ostaju na tvom uređaju.</string>
+	<string>Atelje uses the camera only when you choose “Take Photo” to add a polaroid to your desk. Photos stay on your device.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

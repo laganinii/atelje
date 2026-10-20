@@ -28,21 +28,21 @@ xcrun simctl status_bar booted override --time 9:41 --dataNetwork wifi --wifiMod
 ## 3. Capture
 
 ```bash
-xcrun simctl io booted screenshot ~/Desktop/atelje-01-stol.png
+xcrun simctl io booted screenshot ~/Desktop/atelje-01-desk.png
 ```
 
 Repeat for each screen (rename the file). Use the Simulator at 100% scale so the PNG has the full native resolution; check sizes with `sips -g pixelWidth -g pixelHeight ~/Desktop/atelje-*.png`.
 
 ## 4. Which screens (with suggested captions)
 
-| # | Screen and content | Caption hr | Caption en |
-|---|---|---|---|
-| 1 | **Stol** (desk) right after onboarding: example cards, washi tape, a polaroid visible, the welcome toast gone | Tvoj kreativni stol | Your creative desk |
-| 2 | Tap an empty spot → the **Dodaj na ovom mjestu** sheet (Foto / Link / Bilješka) | Ostavi trag bilo gdje | Leave a trace anywhere |
-| 3 | Open **mokra tkanina** card → detail with **Niti** sticky-note replies; type a reply | Odgovaraj papirićima | Reply with sticky notes |
-| 4 | Add your own photo (drag a photo into the Simulator's Photos first) → polaroid with a caption on the desk | Polaroidi s natpisom | Polaroids with captions |
-| 5 | **Inbox** tab with saved links and tags, or the onboarding role picker (**Odaberi ulogu**) | Sve ostaje na tvom uređaju | Everything stays on your device |
+| # | Screen and content | Caption |
+|---|---|---|
+| 1 | **Desk** right after onboarding: example cards, washi tape, a polaroid visible, the welcome toast gone | Your creative desk |
+| 2 | Tap an empty spot → the **Add here** sheet (Photo / Link / Note) | Leave a trace anywhere |
+| 3 | Open the **wet fabric** card → detail with **Threads** sticky-note replies; type a reply | Reply with sticky notes |
+| 4 | Add your own photo (drag a photo into the Simulator's Photos first) → polaroid with a caption on the desk | Polaroids with captions |
+| 5 | **Inbox** tab with saved links and tags, or the onboarding role picker (**Pick a role**) | Everything stays on your device |
 
-Tips: use your own name in onboarding (e.g. "Gaj", role slikar + glazbenik); avoid the Settings screen; do not show the iOS keyboard on more than one screenshot. Captions can be added in a simple frame (Figma/Keynote) or uploaded as plain screenshots — both are accepted.
+Tips: use your own name in onboarding (e.g. "Gaj", roles painter + musician); avoid the Settings screen; do not show the iOS keyboard on more than one screenshot. Captions can be added in a simple frame (Figma/Keynote) or uploaded as plain screenshots — both are accepted.
 
 Optional App Preview video: `xcrun simctl io booted recordVideo ~/Desktop/atelje.mov` (15–30 s, same sizes).

@@ -183,13 +183,13 @@ window.AteljeNative = {
   async shareExport(json) {
     try {
       if (native) {
-        const name = `atelje-izvoz-${new Date().toISOString().slice(0, 10)}.json`;
+        const name = `atelje-export-${new Date().toISOString().slice(0, 10)}.json`;
         const { uri } = await Filesystem.writeFile({ path: name, data: json, directory: Directory.Cache, encoding: Encoding.UTF8 });
-        await Share.share({ title: "Atelje — izvoz stola", files: [uri], dialogTitle: "Izvoz stola" });
+        await Share.share({ title: "Atelje — desk export", files: [uri], dialogTitle: "Export desk" });
         return true;
       }
       if (navigator.share) {
-        await navigator.share({ title: "Atelje — izvoz stola", text: json });
+        await navigator.share({ title: "Atelje — desk export", text: json });
         return true;
       }
     } catch (err) {

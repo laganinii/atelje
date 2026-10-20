@@ -1,6 +1,6 @@
 # Atelje — App Store listing draft
 
-Bundle ID `ie.laganinii.atelje` · Version 1.0.0 (build 1) · Primary language: Croatian (hr), with an English (U.S.) localization of the store page.
+Bundle ID `ie.laganinii.atelje` · Version 1.0.0 (build 1) · Primary language: **English (U.K.)** (the app UI is English). Optionally add an English (U.S.) localization with the same text.
 Character counts are shown as used/limit.
 
 ## App information
@@ -8,8 +8,7 @@ Character counts are shown as used/limit.
 | Field | Value |
 |---|---|
 | Name | **Atelje** (6/30) |
-| Subtitle (hr) | Stol za kreativne tragove (25/30) |
-| Subtitle (en-US) | A desk for creative traces (26/30) |
+| Subtitle | A desk for creative traces (26/30) |
 | Primary category | **Productivity** |
 | Secondary category | Graphics & Design |
 | Support URL | https://laganinii.github.io/atelje/ |
@@ -18,46 +17,17 @@ Character counts are shown as used/limit.
 | Copyright | 2026 laganinii |
 | Price | Free, no in-app purchases |
 
-Category rationale: Atelje is a note/idea board (capturing notes, photos and links and connecting them), which fits Productivity best; Graphics & Design as secondary reflects the moodboard use. If the name "Atelje" is already taken on the store, fall back to e.g. "Atelje — kreativni stol".
+Category rationale: Atelje is a note/idea board (capturing notes, photos and links and connecting them), which fits Productivity best; Graphics & Design as secondary reflects the moodboard use. If the name "Atelje" is already taken on the store, fall back to e.g. "Atelje — Creative Desk".
 
 ## Promotional text
 
-**hr** (131/170): Ostavi trag: bilješku, polaroid ili link. Odgovaraj papirićima, poveži ideje s [[vezama]]. Bez računa — sve ostaje na tvom uređaju.
-
-**en-US** (148/170): Leave a trace: a note, a polaroid or a link. Reply with sticky notes and connect ideas with [[links]]. No account — everything stays on your device.
+(148/170): Leave a trace: a note, a polaroid or a link. Reply with sticky notes and connect ideas with [[links]]. No account — everything stays on your device.
 
 ## Keywords
 
-**hr** (95/100): `moodboard,bilješke,kreativno,ideje,polaroid,inspiracija,skice,umjetnost,dizajn,glazba,film,moda`
-
-**en-US** (94/100): `moodboard,notes,creative,ideas,polaroid,inspiration,sketchbook,art,design,journal,canvas,board`
+(94/100): `moodboard,notes,creative,ideas,polaroid,inspiration,sketchbook,art,design,journal,canvas,board`
 
 ## Description
-
-### hr (1223/4000)
-
-Atelje je tvoj kreativni stol. Umjesto beskrajnih chatova, ideje ostavljaš kao tragove na velikom stolu koji možeš slobodno pomicati i zumirati.
-
-ŠTO MOŽEŠ OSTAVITI
-• Bilješke — misli, pitanja, rečenice koje ne želiš izgubiti
-• Polaroide — fotografiju s kamere ili iz galerije, s natpisom rukom
-• Linkove — reference iz glazbe, mode, filma; automatske oznake
-
-KAKO RADI
-• Tapni prazno mjesto na stolu i odaberi vrstu traga; dvostruki tap otvara fotografije
-• Pomiči stol prstom, stisni s dva prsta za zum
-• Odgovaraj na trag papirićima — svi odgovori skupljeni su u Nitima
-• Poveži tragove pisanjem [[naziva]] — Atelje pokazuje veze i povratne poveznice
-• Inbox čuva linkove dok ih ne staviš na stol
-• Ti prikazuje samo tvoje tragove; pretraga filtrira po nazivu i sadržaju
-• Na početku odabereš ime i jednu ili dvije uloge (glazbenik, slikar, filmaš, modni, filozof…)
-
-PRIVATNOST NA PRVOM MJESTU
-Nema računa, nema servera, nema oglasa ni praćenja. Sve što ostaviš sprema se samo na tvom uređaju i radi bez interneta. Stol možeš izvesti kao datoteku preko iOS izbornika za dijeljenje ili jednim dodirom obrisati sve.
-
-Stol se otvara s primjerom — tragovima izmišljenih suradnika — da odmah vidiš kako Atelje izgleda u radu.
-
-### en-US (1264/4000)
 
 Atelje is your creative desk. Instead of endless chats, you leave ideas as traces on a large desk you can freely pan and zoom.
 
@@ -69,16 +39,17 @@ WHAT YOU CAN LEAVE
 HOW IT WORKS
 • Tap an empty spot on the desk and choose a trace; double-tap to add a photo
 • Drag to move around, pinch with two fingers to zoom
-• Reply to any trace with sticky notes — all replies are gathered in Niti (Threads)
+• Reply to any trace with sticky notes — all replies are gathered in Threads
 • Connect traces by writing [[a title]] — Atelje shows links and backlinks
 • Inbox keeps links until you place them on the desk
-• Ti (You) shows only your traces; search filters by title and content
+• You shows only your own traces; search filters by title and content
+• Mark a trace Private to blur it on the desk
 • Start by choosing a name and one or two roles (musician, painter, filmmaker, fashion, philosopher…)
 
 PRIVACY FIRST
 No account, no server, no ads, no tracking. Everything you leave is stored only on your device and works offline. Export your desk as a file through the iOS share sheet, or erase everything with one tap.
 
-The desk opens with an example — traces from fictional collaborators — so you can see Atelje in action right away. The app interface is in Croatian.
+The desk opens with an example — traces from fictional collaborators — so you can see Atelje in action right away.
 
 ## Age rating questionnaire
 
@@ -112,18 +83,18 @@ The app contains no third-party content. Example desk content (names Iva, Noa, M
 ## App Review notes (paste into App Store Connect → App Review Information → Notes)
 
 ```
-Atelje is a single-user creative desk ("moodboard") that runs entirely on the device. The UI is in Croatian.
+Atelje is a single-user creative desk ("moodboard") that runs entirely on the device. The UI is in English.
 There is NO login, NO account, NO server, NO network access, NO in-app purchases, NO hidden, debug or feature-flagged functionality. No demo account is needed.
 
 How to reach every feature:
-1. First launch: tap "Započni — odaberi ulogu", pick 1–2 roles, type a name, tap "Uđi u atelje".
-2. Stol (Desk) tab: drag to pan, pinch to zoom; the desk starts with example traces from fictional collaborators.
-3. Tap an empty spot → sheet with Foto (photo picker / camera), Link, Bilješka (note). Double-tap an empty spot → photo picker. The + button bottom-right opens the same choices.
-4. Tap a card → detail: edit text, delete, export, "Niti" (sticky-note replies, type in the field at the bottom) and "Veze" (links/backlinks created by writing [[title]] in a note).
-5. Niti tab: all replies; tap one to jump to its card.
-6. Inbox tab: paste a link to save it, "Dodaj na stol" moves it to the desk. Links are stored as text; the app never opens websites.
-7. Ti tab: only your own traces. Search field at the top filters cards.
-8. Settings (slider icon, top right) → "Postavke": profile, "Uredi uloge" (edit roles), "Izvezi stol" (export JSON via the iOS share sheet), "Vrati primjer" (reset to the example desk), "Odjava — obriši podatke" (erase all local data and return to onboarding).
+1. First launch: tap "Start — pick a role", pick 1–2 roles, type a name, tap "Enter the atelje".
+2. Desk tab: drag to pan, pinch to zoom; the desk starts with example traces from fictional collaborators.
+3. Tap an empty spot → sheet with Photo (photo picker / camera), Link, Note. Double-tap an empty spot → photo picker. The + button bottom-right opens the same choices.
+4. Tap a card → detail: edit text, delete, Export, "Threads" (sticky-note replies, type in the field at the bottom) and "Links" (links/backlinks created by writing [[title]] in a note). The "Public / Private" toggle only changes how the card is shown on this device (Private blurs it for the example collaborators); nothing is ever published or shared with other users — there are no other users.
+5. Threads tab: all replies; tap one to jump to its card.
+6. Inbox tab: paste a link to save it, "Add to desk" moves it to the desk. Links are stored as text; the app never opens websites.
+7. You tab: only your own traces. Search field at the top filters cards.
+8. Settings (slider icon, top right): profile, "Edit roles", "Export desk" (export JSON via the iOS share sheet), "Restore sample" (reset to the example desk), "Sign out — erase data" (erase all local data and return to onboarding).
 Camera permission is requested only if the user chooses "Take Photo" in the iOS photo picker.
 Haptic feedback is used for interactions. Everything works offline; data persists between launches.
 ```

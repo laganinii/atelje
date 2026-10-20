@@ -37,9 +37,23 @@ test("fonts are bundled", () => {
 
 test("no developer notes, fake sign-in or fake voice memo in release bundle", () => {
   const js = walk(dist).filter((f) => f.endsWith(".js")).map((f) => readFileSync(f, "utf8")).join("\n");
-  for (const s of ["in-memory", "visibly local", "local draft", "preview mode", "production perfect", "Performance audit", "Nastavi s Apple ID", "Apple ID", "12s memo", "No localStorage", "spring 0.32"]) {
+  for (const s of ["in-memory", "visibly local", "local draft", "preview mode", "production perfect", "Performance audit", "Nastavi s Apple ID", "Apple ID", "12s memo", "No localStorage", "spring 0.32", "will-change transform", "scale 0.86", "0.86→1", "• scale", "rounded-[14px] p-4 flex items-center gap-4 mb-4"]) {
     assert.ok(!js.includes(s), `found "${s}"`);
   }
+});
+
+test("UI is English (no leftover Croatian copy)", () => {
+  const js = walk(dist).filter((f) => f.endsWith(".js")).map((f) => readFileSync(f, "utf8")).join("\n");
+  for (const s of ["Save trace", "Threads", "Export desk", "Public", "Private", "Sign out — erase data", "Start — pick a role"]) {
+    assert.ok(js.includes(s), `missing English copy "${s}"`);
+  }
+  for (const s of ["Spremi trag", "Izvezi", "Postavke", "Odjava", "Javno", "Privatno", "tragova", "Bilješka", "Odustani", "Zalijepi", "Tapni", "Dobrodošao", "Niti —", "label:\"Stol\"", "label:\"Ti\"", "Pitaj atelje", "ZAJEDNIČKI"]) {
+    assert.ok(!js.includes(s), `found Croatian copy "${s}"`);
+  }
+  // Croatian diacritics may only appear in the internal role id "slušatelj".
+  const diacritics = js.replaceAll("slušatelj", "").match(/[čćžšđČĆŽŠĐ]/g);
+  assert.equal(diacritics, null, "Croatian diacritics in the bundle");
+  assert.match(readFileSync(join(dist, "index.html"), "utf8"), /<html lang="en">/);
 });
 
 test("artifact host scripts were dropped", () => {

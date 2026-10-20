@@ -5,8 +5,7 @@
   "ios": {
     "contentInset": "never",
     "scrollEnabled": false,
-    "backgroundColor": "#F5F1E8",
-    "limitsNavigationsToAppBoundDomains": true
+    "backgroundColor": "#F5F1E8"
   },
   "plugins": {
     "SplashScreen": {

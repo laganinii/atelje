@@ -1,0 +1,215 @@
+# Atelje: build the iOS app on a GitHub macOS runner and upload it to TestFlight.
+# No Mac needed for CI. The web app is bundled offline into the app (no server URL).
+#
+# How it works
+#   1. npm ci, tests, Vite build, `npx cap sync ios` (copies dist/ into the
+#      committed Xcode project at ios/App; plugins come in via Swift Package Manager).
+#   2. Archives the app WITHOUT signing (proves it compiles, needs no secrets).
+#   3. Checks the signing secrets; stops here with a clear error if any is missing.
+#   4. Exports a signed .ipa with Xcode automatic (cloud) signing using the
+#      App Store Connect API key (no certificates or profiles to manage).
+#   5. Uploads the .ipa to TestFlight with altool.
+#
+# Required GitHub repo SECRETS (Settings > Secrets and variables > Actions)
+#   ASC_KEY_ID      Key ID of an App Store Connect API key (Admin role, needed so
+#                   Xcode can create the distribution certificate/profile in the cloud)
+#   ASC_ISSUER_ID   Issuer ID shown on the same Users and Access > Integrations > Keys page
+#   ASC_KEY_P8      Full text of the AuthKey_XXXXXXXXXX.p8 file (including BEGIN/END lines)
+#   APPLE_TEAM_ID   10-character Apple Developer Team ID
+#
+# Apple side: an App Store Connect app record for bundle id ie.laganinii.atelje
+# must exist before the first upload.
+#
+# Triggers
+#   - Manually: Actions > iOS TestFlight Build > Run workflow (always runs; stops
+#     before signing if secrets are missing).
+#   - Push to main: the macOS job only runs once all four secrets are set, so
+#     pushes don't burn macOS minutes before the Apple setup is done.
+
+name: iOS TestFlight Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "index.html"
+      - "ios/**"
+      - "package.json"
+      - "package-lock.json"
+      - "capacitor.config.json"
+      - ".github/workflows/ios-testflight.yml"
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: "Release notes for this TestFlight build"
+        required: false
+        default: "Latest changes from main"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-testflight-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    name: Check Apple setup
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - name: Check secrets
+        id: check
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          missing=()
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8 APPLE_TEAM_ID; do
+            [ -n "${!name}" ] || missing+=("$name")
+          done
+          if [ ${#missing[@]} -eq 0 ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "All Apple secrets are set."
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Missing repo secrets: ${missing[*]}. Push builds are skipped until they are added; manual runs stop before signing."
+          fi
+
+  build-and-upload:
+    name: Build + Upload to TestFlight
+    needs: preflight
+    if: github.event_name == 'workflow_dispatch' || needs.preflight.outputs.ready == 'true'
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      XCODE_PROJECT: ios/App/App.xcodeproj
+      BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Test
+        run: |
+          npm test
+          npm run check:ios
+
+      - name: Sync Capacitor iOS project
+        run: npx cap sync ios
+
+      - name: Show Xcode
+        run: |
+          xcodebuild -version
+          xcode-select -p
+
+      # Unsigned archive: proves the app compiles for device without any secrets.
+      - name: Archive (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project "$XCODE_PROJECT" \
+            -scheme App \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            | tee "$RUNNER_TEMP/archive.log" | grep -E "error:|ARCHIVE (SUCCEEDED|FAILED)|BUILD (SUCCEEDED|FAILED)" || true
+          test -d "$RUNNER_TEMP/App.xcarchive/Products/Applications/App.app" || { tail -n 200 "$RUNNER_TEMP/archive.log"; exit 1; }
+          echo "Unsigned archive OK (version 1.0.0, build $BUILD_NUMBER)"
+
+      - name: Check signing secrets
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          missing=()
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8 APPLE_TEAM_ID; do
+            [ -n "${!name}" ] || missing+=("$name")
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::The app built fine, but these repo secrets are missing, so it can't be signed or uploaded: ${missing[*]}"
+            exit 1
+          fi
+
+      - name: Install App Store Connect API key
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY_PATH"
+          chmod 600 "$KEY_PATH"
+          echo "ASC_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: Export signed .ipa (Xcode cloud signing)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>export</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          ls -la "$RUNNER_TEMP/export"
+
+      - name: Upload to TestFlight
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          IPA=$(ls "$RUNNER_TEMP"/export/*.ipa | head -n 1)
+          xcrun altool --upload-app -f "$IPA" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Remove API key
+        if: always()
+        run: rm -rf ~/.appstoreconnect/private_keys
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: ${{ runner.temp }}/archive.log
+          if-no-files-found: ignore
+          retention-days: 7

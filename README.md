@@ -48,7 +48,7 @@ Pick a simulator or your iPhone and press Run. For a device, select your team un
 
 ## CI / TestFlight
 
-`.github/workflows/ios-testflight.yml` runs on `macos-26`:
+`.github/workflows/ios-testflight.yml` runs on `macos-15` and selects the newest installed Xcode 26 (App Store uploads require the iOS 26 SDK):
 
 1. `npm ci`, `npm run build`, `npm test`, `npm run check:ios`, `npx cap sync ios`
 2. Unsigned `xcodebuild archive` (proves it compiles, no secrets needed)

@@ -84,8 +84,10 @@ jobs:
     name: Build + Upload to TestFlight
     needs: preflight
     if: github.event_name == 'workflow_dispatch' || needs.preflight.outputs.ready == 'true'
-    # macOS 26 image: Xcode 26 / iOS 26 SDK, which App Store Connect requires for uploads.
-    runs-on: macos-26
+    # macos-15 queues reliably; it also ships Xcode 26.x, selected below because
+    # App Store Connect requires the iOS 26 SDK for uploads. (macos-26 also works
+    # but arm64 capacity was constrained when this was set up.)
+    runs-on: macos-15
     timeout-minutes: 45
     env:
       XCODE_PROJECT: ios/App/App.xcodeproj
@@ -114,10 +116,12 @@ jobs:
       - name: Sync Capacitor iOS project
         run: npx cap sync ios
 
-      - name: Show Xcode
+      - name: Select Xcode 26
         run: |
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -n 1)
+          if [ -z "$XCODE" ]; then echo "::error::No Xcode 26 on this runner (iOS 26 SDK is required for App Store uploads)"; exit 1; fi
+          sudo xcode-select -s "$XCODE/Contents/Developer"
           xcodebuild -version
-          xcode-select -p
 
       # Unsigned archive: proves the app compiles for device without any secrets.
       - name: Archive (unsigned)
